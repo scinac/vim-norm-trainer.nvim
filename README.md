@@ -14,12 +14,9 @@ REAL true vim users love `:norm`, `:norm`  is power, mastering it makes you insa
 
 Using [lazy.nvim](https://github.com/folke/lazy.nvim):
 
-Ill implement better ways to install it soon, for now clone it somewhere and include this somewhere in your lua/plugins dir
-
 ```lua
 {
-  "PathToWhereverYouClonedIt/vim-norm-trainer.nvim",
-  name = "norm-trainer",
+  "scinac/vim-norm-trainer.nvim",
   lazy = false,
 }
 ```
