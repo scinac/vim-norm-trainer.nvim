@@ -33,24 +33,39 @@ local levels = {
 		win = { "System crash", "All good", "Low battery" },
 	},
 	{
+		msg = "Goal: Convert snake_case to camelCase for each line.",
+		start = { "my_variable", "hello_world", "test_case" },
+		win = { "myVariable", "helloWorld", "testCase" },
+	},
+	{
+		msg = "Goal: Convert each variable name to uppercase.",
+		start = { "username", "password", "token" },
+		win = { "USERNAME", "PASSWORD", "TOKEN" },
+	},
+	{
 		msg = "Goal: Capitalize the first letter and add a period at the end.",
 		start = { "hello", "vim", "norm" },
 		win = { "Hello.", "Vim.", "Norm." },
 	},
 	{
+		msg = "Goal: Prepend line numbers to log lines.",
+		start = { "Starting server", "Connected to DB", "Listening on port 8080" },
+		win = { "1. Starting server", "2. Connected to DB", "3. Listening on port 8080" },
+	},
+	{
+		msg = 'Goal: Turn each name into a print("name") statement.',
+		start = { "Alice", "Bob", "Charlie" },
+		win = { 'print("Alice")', 'print("Bob")', 'print("Charlie")' },
+	},
+	{
+		msg = "Goal: Remove the file extension from each filename.",
+		start = { "report.pdf", "image.png", "data.csv" },
+		win = { "report", "image", "data" },
+	},
+	{
 		msg = "Goal: Swap 'true' to 'false' on every line.",
 		start = { "is_active = true", "is_admin = true", "is_valid = true" },
 		win = { "is_active = false", "is_admin = false", "is_valid = false" },
-	},
-	{
-		msg = "Goal: Delete everything after the first word.",
-		start = { "Key: Value", "User: scinac", "Repo: vim-norm" },
-		win = { "Key:", "User:", "Repo:" },
-	},
-	{
-		msg = "Goal: Duplicate every line.",
-		start = { "repeat", "me" },
-		win = { "repeat", "repeat", "me", "me" },
 	},
 	{
 		msg = "Goal: Turn these into HTML tags.",
@@ -61,6 +76,31 @@ local levels = {
 		msg = 'Goal: Turn each fruit into a fruits.add("fruit") call.',
 		start = { "apple", "banana", "cherry" },
 		win = { 'fruits.add("apple")', 'fruits.add("banana")', 'fruits.add("cherry")' },
+	},
+	{
+		msg = "Goal: Swap first and last words of each line.",
+		start = { "hello world", "foo bar baz", "vim is fun" },
+		win = { "world hello", "baz bar foo", "fun is vim" },
+	},
+	{
+		msg = "Goal: Surround numbers with square brackets.",
+		start = { "x = 10", "y = 42", "z = 7" },
+		win = { "x = [10]", "y = [42]", "z = [7]" },
+	},
+	{
+		msg = "Goal: Wrap each string in a console.log(...) call.",
+		start = { "Starting server", "Connected to DB", "Server stopped" },
+		win = { 'console.log("Starting server")', 'console.log("Connected to DB")', 'console.log("Server stopped")' },
+	},
+	{
+		msg = "Goal: Swap text before and after '=' on each line.",
+		start = { "x=10", "y=20", "name=John" },
+		win = { "10=x", "20=y", "John=name" },
+	},
+	{
+		msg = 'Goal: Wrap each key-value pair as setOption("key", "value") call.',
+		start = { "theme=dark", "lang=en", "mode=auto" },
+		win = { 'setOption("theme", "dark")', 'setOption("lang", "en")', 'setOption("mode", "auto")' },
 	},
 }
 
