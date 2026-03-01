@@ -33,11 +33,6 @@ local levels = {
 		win = { "System crash", "All good", "Low battery" },
 	},
 	{
-		msg = "Goal: Convert snake_case to camelCase for each line.",
-		start = { "my_variable", "hello_world", "test_case" },
-		win = { "myVariable", "helloWorld", "testCase" },
-	},
-	{
 		msg = "Goal: Convert each variable name to uppercase.",
 		start = { "username", "password", "token" },
 		win = { "USERNAME", "PASSWORD", "TOKEN" },
@@ -46,11 +41,6 @@ local levels = {
 		msg = "Goal: Capitalize the first letter and add a period at the end.",
 		start = { "hello", "vim", "norm" },
 		win = { "Hello.", "Vim.", "Norm." },
-	},
-	{
-		msg = "Goal: Prepend line numbers to log lines.",
-		start = { "Starting server", "Connected to DB", "Listening on port 8080" },
-		win = { "1. Starting server", "2. Connected to DB", "3. Listening on port 8080" },
 	},
 	{
 		msg = 'Goal: Turn each name into a print("name") statement.',
@@ -78,11 +68,6 @@ local levels = {
 		win = { 'fruits.add("apple")', 'fruits.add("banana")', 'fruits.add("cherry")' },
 	},
 	{
-		msg = "Goal: Swap first and last words of each line.",
-		start = { "hello world", "foo bar baz", "vim is fun" },
-		win = { "world hello", "baz bar foo", "fun is vim" },
-	},
-	{
 		msg = "Goal: Surround numbers with square brackets.",
 		start = { "x = 10", "y = 42", "z = 7" },
 		win = { "x = [10]", "y = [42]", "z = [7]" },
@@ -91,11 +76,6 @@ local levels = {
 		msg = "Goal: Wrap each string in a console.log(...) call.",
 		start = { "Starting server", "Connected to DB", "Server stopped" },
 		win = { 'console.log("Starting server")', 'console.log("Connected to DB")', 'console.log("Server stopped")' },
-	},
-	{
-		msg = "Goal: Swap text before and after '=' on each line.",
-		start = { "x=10", "y=20", "name=John" },
-		win = { "10=x", "20=y", "John=name" },
 	},
 	{
 		msg = 'Goal: Wrap each key-value pair as setOption("key", "value") call.',
@@ -111,7 +91,7 @@ function M.start_game()
 	local buf = vim.api.nvim_create_buf(false, true)
 
 	local header = {
-		"--- LEVEL " .. current_level .. " ---",
+		"--- LEVEL " .. current_level .. " --- Press enter on this line to [SKIP]",
 		level.msg,
 		"",
 		"EDIT BELOW:",
@@ -129,6 +109,16 @@ function M.start_game()
 	vim.api.nvim_buf_set_lines(buf, 0, -1, false, header)
 	vim.api.nvim_buf_set_lines(buf, #header, #header, false, level.start)
 	vim.api.nvim_buf_set_lines(buf, -1, -1, false, footer)
+
+	vim.keymap.set("n", "<CR>", function()
+		local line = vim.api.nvim_get_current_line()
+		if line:find("%[SKIP%]") then
+			current_level = current_level + 1
+			vim.schedule(function()
+				M.start_game()
+			end)
+		end
+	end, { buffer = buf, silent = true })
 
 	vim.api.nvim_buf_add_highlight(buf, ns_id, "Comment", 0, 0, -1)
 	vim.api.nvim_buf_add_highlight(buf, ns_id, "Special", 1, 0, -1)
