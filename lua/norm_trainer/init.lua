@@ -37,6 +37,31 @@ local levels = {
 		start = { "hello", "vim", "norm" },
 		win = { "Hello.", "Vim.", "Norm." },
 	},
+	{
+		msg = "Goal: Swap 'true' to 'false' on every line.",
+		start = { "is_active = true", "is_admin = true", "is_valid = true" },
+		win = { "is_active = false", "is_admin = false", "is_valid = false" },
+	},
+	{
+		msg = "Goal: Delete everything after the first word.",
+		start = { "Key: Value", "User: scinac", "Repo: vim-norm" },
+		win = { "Key:", "User:", "Repo:" },
+	},
+	{
+		msg = "Goal: Duplicate every line.",
+		start = { "repeat", "me" },
+		win = { "repeat", "repeat", "me", "me" },
+	},
+	{
+		msg = "Goal: Turn these into HTML tags.",
+		start = { "Home", "About", "Contact" },
+		win = { "<li>Home</li>", "<li>About</li>", "<li>Contact</li>" },
+	},
+	{
+		msg = 'Goal: Turn each fruit into a fruits.add("fruit") call.',
+		start = { "apple", "banana", "cherry" },
+		win = { 'fruits.add("apple")', 'fruits.add("banana")', 'fruits.add("cherry")' },
+	},
 }
 
 local current_level = 1
