@@ -1,4 +1,5 @@
 local M = {}
+local ns_id = vim.api.nvim_create_namespace("NormTrainer")
 
 local levels = {
 	{
@@ -11,25 +12,73 @@ local levels = {
 		start = { "one", "two", "three" },
 		win = { '"one"', '"two"', '"three"' },
 	},
+	{
+		msg = "Goal: Turn this list into a JSON-style array (add quotes and a comma).",
+		start = { "id", "name", "email" },
+		win = { '"id",', '"name",', '"email",' },
+	},
+	{
+		msg = "Goal: Comment out only the lines containing 'TODO'. (Hint: :g/pattern/norm)",
+		start = { "var x = 10", "TODO: fix bug", "var y = 20", "TODO: add tests" },
+		win = { "var x = 10", "// TODO: fix bug", "var y = 20", "// TODO: add tests" },
+	},
+	{
+		msg = "Goal: Convert Markdown list to a task list (Change '*' to '* [ ]').",
+		start = { "* Buy milk", "* Clean room", "* Code plugin" },
+		win = { "* [ ] Buy milk", "* [ ] Clean room", "* [ ] Code plugin" },
+	},
+	{
+		msg = "Goal: Delete the first word on every line.",
+		start = { "Error: System crash", "Info: All good", "Warn: Low battery" },
+		win = { "System crash", "All good", "Low battery" },
+	},
+	{
+		msg = "Goal: Capitalize the first letter and add a period at the end.",
+		start = { "hello", "vim", "norm" },
+		win = { "Hello.", "Vim.", "Norm." },
+	},
 }
 
 local current_level = 1
 
 function M.start_game()
 	local level = levels[current_level]
+	local buf = vim.api.nvim_create_buf(false, true)
 
-	local buf = vim.api.nvim_create_buf(false, true) -- create empty for now may include level message at the start
+	local header = {
+		"--- LEVEL " .. current_level .. " ---",
+		level.msg,
+		"",
+		"EDIT BELOW:",
+		"--------------------",
+	}
+	local footer = {
+		"--------------------",
+		"GOAL:",
+	}
 
-	vim.api.nvim_buf_set_lines(buf, 0, -1, false, level.start)
+	for _, line in ipairs(level.win) do
+		table.insert(footer, line) -- appending the winning state to footer
+	end
+
+	vim.api.nvim_buf_set_lines(buf, 0, -1, false, header)
+	vim.api.nvim_buf_set_lines(buf, #header, #header, false, level.start)
+	vim.api.nvim_buf_set_lines(buf, -1, -1, false, footer)
+
+	vim.api.nvim_buf_add_highlight(buf, ns_id, "Comment", 0, 0, -1)
+	vim.api.nvim_buf_add_highlight(buf, ns_id, "Special", 1, 0, -1)
+	vim.api.nvim_buf_add_highlight(buf, ns_id, "NonText", #header + #level.start, 0, -1)
+
 	vim.api.nvim_set_current_buf(buf)
-
 	print(level.msg)
 
 	vim.api.nvim_create_autocmd("CmdlineLeave", {
 		buffer = buf,
 		callback = function()
 			vim.defer_fn(function()
-				local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+				local start_line = #header
+				local end_line = #header + #level.start
+				local lines = vim.api.nvim_buf_get_lines(buf, start_line, end_line, false) -- just the edited part not the header footer stuff
 
 				if vim.deep_equal(lines, level.win) then
 					print("Level " .. current_level .. " cleared!")
