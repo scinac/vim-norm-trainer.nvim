@@ -3,6 +3,11 @@ local ns_id = vim.api.nvim_create_namespace("NormTrainer")
 
 local levels = {
 	{
+		msg = "Goal: Append a semicolon to the end of every line.",
+		start = { "const x = 1", "let y = 2", "var z = 3" },
+		win = { "const x = 1;", "let y = 2;", "var z = 3;" },
+	},
+	{
 		msg = "Goal: Add '- ' to the start of every line.",
 		start = { "apple", "banana", "cherry" },
 		win = { "- apple", "- banana", "- cherry" },
@@ -38,6 +43,11 @@ local levels = {
 		win = { "USERNAME", "PASSWORD", "TOKEN" },
 	},
 	{
+		msg = "Goal: Turn every line that is a TODO into an empty one.",
+		start = { "apple", "//TODO add error_log", "banana", "//TODO glaze vim", "cherry" },
+		win = { "apple", "", "banana", "", "cherry" },
+	},
+	{
 		msg = "Goal: Capitalize the first letter and add a period at the end.",
 		start = { "hello", "vim", "norm" },
 		win = { "Hello.", "Vim.", "Norm." },
@@ -48,9 +58,24 @@ local levels = {
 		win = { 'print("Alice")', 'print("Bob")', 'print("Charlie")' },
 	},
 	{
+		msg = "Goal: Transform list to 'Self-Assignment' (x = x).",
+		start = { "width", "height", "depth" },
+		win = { "width = width", "height = height", "depth = depth" },
+	},
+	{
 		msg = "Goal: Remove the file extension from each filename.",
 		start = { "report.pdf", "image.png", "data.csv" },
 		win = { "report", "image", "data" },
+	},
+	{
+		msg = "Goal: The 'Incognito' level. Replace every character with a '*'.",
+		start = { "password123", "secret_key", "admin_login" },
+		win = { "***********", "**********", "***********" },
+	},
+	{
+		msg = "Goal: Clean up this messy list by removing the trailing whitespace.",
+		start = { "item1   ", "item2 ", "item3      " },
+		win = { "item1", "item2", "item3" },
 	},
 	{
 		msg = "Goal: Swap 'true' to 'false' on every line.",
@@ -73,9 +98,14 @@ local levels = {
 		win = { "x = [10]", "y = [42]", "z = [7]" },
 	},
 	{
-		msg = "Goal: Wrap each string in a console.log(...) call.",
-		start = { "Starting server", "Connected to DB", "Server stopped" },
-		win = { 'console.log("Starting server")', 'console.log("Connected to DB")', 'console.log("Server stopped")' },
+		msg = "Goal: The 'JSON-ify' level. Turn 'key=value' into '\"key\": \"value\"'.",
+		start = { "id=101", "name=admin", "role=user" },
+		win = { '"id": "101"', '"name": "admin"', '"role": "user"' },
+	},
+	{
+		msg = "Goal: Swap the order of these CSV values (first,last -> last,first).",
+		start = { "John,Doe", "Jane,Smith", "Bob,Vance" },
+		win = { "Doe,John", "Smith,Jane", "Vance,Bob" },
 	},
 	{
 		msg = 'Goal: Wrap each key-value pair as setOption("key", "value") call.',
