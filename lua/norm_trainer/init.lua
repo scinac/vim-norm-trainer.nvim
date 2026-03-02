@@ -86,12 +86,35 @@ local levels = {
 
 local current_level = 1
 
-function M.start_game()
-	local level = levels[current_level]
-	local buf = vim.api.nvim_create_buf(false, true)
+local function checkWinCondition(buf, header_height, level)
+	vim.api.nvim_create_autocmd("CmdlineLeave", {
+		buffer = buf,
+		callback = function()
+			vim.defer_fn(function()
+				local start_line = header_height
+				local end_line = header_height + #level.start
+				local lines = vim.api.nvim_buf_get_lines(buf, start_line, end_line, false) -- just the edited part not the header footer stuff
 
+				if vim.deep_equal(lines, level.win) then
+					print("Level " .. current_level .. " cleared!")
+					current_level = current_level + 1
+
+					if levels[current_level] then
+						M.start_game()
+					else
+						print("You finished all Levels!")
+					end
+				end
+			end, 10)
+		end,
+	})
+end
+
+local function setUpBuffer(buf, level)
 	local header = {
-		"--- LEVEL " .. current_level .. " --- Press enter on this line to [SKIP]",
+		"--- LEVEL " .. current_level .. " ---",
+		"--- Press enter on this line to [SKIP] this level ---",
+		"--- Press enter on this line to [GOBACK] one level ---",
 		level.msg,
 		"",
 		"EDIT BELOW:",
@@ -110,44 +133,52 @@ function M.start_game()
 	vim.api.nvim_buf_set_lines(buf, #header, #header, false, level.start)
 	vim.api.nvim_buf_set_lines(buf, -1, -1, false, footer)
 
+	vim.api.nvim_buf_add_highlight(buf, ns_id, "Comment", 0, 0, -1)
+	vim.api.nvim_buf_add_highlight(buf, ns_id, "Special", 1, 0, -1) -- skip
+	vim.api.nvim_buf_add_highlight(buf, ns_id, "Special", 2, 0, -1) -- go back
+	vim.api.nvim_buf_add_highlight(buf, ns_id, "NonText", #header + #level.start, 0, -1)
+
+	return #header
+end
+
+local function handle_navigation(buf)
 	vim.keymap.set("n", "<CR>", function()
 		local line = vim.api.nvim_get_current_line()
+
 		if line:find("%[SKIP%]") then
-			current_level = current_level + 1
-			vim.schedule(function()
-				M.start_game()
-			end)
+			if current_level < #levels then
+				current_level = current_level + 1
+				vim.schedule(M.start_game)
+			else
+				print("You are already at the last level.")
+			end
+		elseif line:find("%[GOBACK%]") then
+			if current_level > 1 then
+				current_level = current_level - 1
+				vim.schedule(M.start_game)
+			else
+				print("You are already at the first level.")
+			end
 		end
 	end, { buffer = buf, silent = true })
+end
 
-	vim.api.nvim_buf_add_highlight(buf, ns_id, "Comment", 0, 0, -1)
-	vim.api.nvim_buf_add_highlight(buf, ns_id, "Special", 1, 0, -1)
-	vim.api.nvim_buf_add_highlight(buf, ns_id, "NonText", #header + #level.start, 0, -1)
+function M.start_game()
+	local level = levels[current_level]
+	if not level then
+		return
+	end
+
+	local buf = vim.api.nvim_create_buf(false, true)
+
+	local header_height = setUpBuffer(buf, level) -- for checking just specific part in winCondition
+
+	handle_navigation(buf) -- for skipping and going back levels
+
+	checkWinCondition(buf, header_height, level)
 
 	vim.api.nvim_set_current_buf(buf)
 	print(level.msg)
-
-	vim.api.nvim_create_autocmd("CmdlineLeave", {
-		buffer = buf,
-		callback = function()
-			vim.defer_fn(function()
-				local start_line = #header
-				local end_line = #header + #level.start
-				local lines = vim.api.nvim_buf_get_lines(buf, start_line, end_line, false) -- just the edited part not the header footer stuff
-
-				if vim.deep_equal(lines, level.win) then
-					print("Level " .. current_level .. " cleared!")
-					current_level = current_level + 1
-
-					if levels[current_level] then
-						M.start_game()
-					else
-						print("You finished all Levels!")
-					end
-				end
-			end, 10)
-		end,
-	})
 end
 
 return M
